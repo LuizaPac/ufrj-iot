@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+
+<title>Sensores</title>
+
+<style>
+
+body{
+    font-family: Arial;
+    text-align: center;
+}
+
+.card{
+    border: 1px solid #ccc;
+    padding: 20px;
+    width: 350px;
+    margin: auto;
+    border-radius: 10px;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="card">
+
+<h1>Monitoramento</h1>
+
+<h2>BMP280</h2>
+
+<p>
+Temperatura:
+<span id="tempBMP">--</span>
+</p>
+
+<p>
+Pressão:
+<span id="pressao">--</span>
+</p>
+
+<p>
+Altitude:
+<span id="altitude">--</span>
+</p>
+
+<h2>DHT22</h2>
+
+<p>
+Temperatura:
+<span id="tempDHT">--</span>
+</p>
+
+<p>
+Umidade:
+<span id="umidade">--</span>
+</p>
+
+<p id="statusDHT">--</p>
+
+</div>
+
+<script src="/socket.io/socket.io.js"></script>
+
+<script>
+
+const socket = io();
+
+function formatValue(value, unit) {
+    return Number.isFinite(value) ? value.toFixed(2) + " " + unit : "--";
+}
+
+socket.on("dadosSensor", (dados) => {
+
+    document.getElementById("tempBMP").innerHTML =
+        formatValue(dados.temperaturaBMP, "°C");
+
+    document.getElementById("tempDHT").innerHTML =
+        formatValue(dados.temperaturaDHT, "°C");
+
+    document.getElementById("pressao").innerHTML =
+        formatValue(dados.pressao, "hPa");
+
+    document.getElementById("altitude").innerHTML =
+        formatValue(dados.altitude, "m");
+
+    document.getElementById("umidade").innerHTML =
+        formatValue(dados.umidade, "%");
+
+    document.getElementById("statusDHT").innerHTML =
+        dados.dhtStatus || "--";
+});
+
+</script>
+
+</body>
+</html>

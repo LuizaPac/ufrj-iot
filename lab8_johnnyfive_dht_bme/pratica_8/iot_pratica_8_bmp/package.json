@@ -1,0 +1,19 @@
+{
+  "name": "iot_pratica_8",
+  "version": "1.0.0",
+  "main": "server_dht.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "bme280-sensor": "^0.1.7",
+    "etherport-client": "^0.1.4",
+    "express": "^5.2.1",
+    "johnny-five": "^2.1.0",
+    "node-dht-sensor": "^0.5.1",
+    "socket.io": "^4.8.3"
+  }
+}

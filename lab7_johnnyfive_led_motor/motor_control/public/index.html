@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Controle Motor DC</title>
+</head>
+<body>
+  <h1>Controle Motor DC</h1>
+
+  <p>Status da placa: <span id="boardStatus">conectando...</span></p>
+
+  <input type="range" id="speed" min="0" max="255" value="0">
+
+  <p>Velocidade: <span id="speedValue">0</span></p>
+
+  <button onclick="forward()">Frente</button>
+  <button onclick="reverse()">Ré</button>
+  <button onclick="stopMotor()">Parar</button>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    const socket = io();
+
+    const boardStatus = document.getElementById("boardStatus");
+    const speedSlider = document.getElementById("speed");
+    const speedValue = document.getElementById("speedValue");
+
+    socket.on("status", ({ boardReady }) => {
+      boardStatus.innerText = boardReady ? "conectada" : "aguardando conexão";
+    });
+
+    speedSlider.addEventListener("input", () => {
+      speedValue.innerText = speedSlider.value;
+      socket.emit("motorSpeed", speedSlider.value);
+    });
+
+    function forward() {
+      socket.emit("forward");
+    }
+
+    function reverse() {
+      socket.emit("reverse");
+    }
+
+    function stopMotor() {
+      speedSlider.value = "0";
+      speedValue.innerText = "0";
+      socket.emit("stop");
+    }
+  </script>
+</body>
+</html>

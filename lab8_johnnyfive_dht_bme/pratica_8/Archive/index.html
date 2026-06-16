@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+
+  <meta charset="UTF-8">
+
+  <title>Motor de Passo</title>
+
+  <link rel="stylesheet" href="style.css">
+
+</head>
+
+<body>
+
+  <div class="container">
+
+    <div class="card">
+
+      <h1>Controle do Motor</h1>
+
+      <input
+        type="range"
+        min="2"
+        max="30"
+        value="10"
+        id="slider"
+      >
+
+      <p id="valor">10 ms</p>
+
+      <button onclick="horario()">
+        Horário
+      </button>
+
+      <button onclick="antiHorario()">
+        Anti-horário
+      </button>
+
+      <button onclick="pararMotor()">
+        Parar
+      </button>
+
+    </div>
+
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="script.js"></script>
+
+</body>
+
+</html>

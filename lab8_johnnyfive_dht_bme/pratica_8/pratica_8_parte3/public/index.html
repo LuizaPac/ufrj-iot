@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Controle Motor</title>
+</head>
+
+<body>
+
+    <h1>Motor de Passo</h1>
+
+    <input type="range"
+           id="slider"
+           min="0"
+           max="500"
+           value="0">
+
+    <p id="valor">0</p>
+
+    <script src="/socket.io/socket.io.js"></script>
+
+    <script>
+
+        const socket = io();
+
+        const slider = document.getElementById("slider");
+        const valor = document.getElementById("valor");
+
+        slider.addEventListener("input", () => {
+
+            valor.innerText = slider.value;
+
+            socket.emit("motor", slider.value);
+
+        });
+
+    </script>
+
+</body>
+</html>

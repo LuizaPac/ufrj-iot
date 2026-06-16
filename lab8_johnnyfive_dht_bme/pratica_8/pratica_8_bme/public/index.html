@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Sensores</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 24px;
+      background: #f3f4f6;
+      color: #111827;
+    }
+
+    .panel {
+      max-width: 420px;
+      margin: 0 auto;
+      padding: 24px;
+      background: #ffffff;
+      border-radius: 12px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+    }
+
+    h1, h2 {
+      margin-top: 0;
+    }
+
+    h2 {
+      margin-top: 24px;
+      font-size: 1.1rem;
+    }
+
+    p {
+      margin: 12px 0;
+    }
+
+    #dht-status {
+      font-size: 0.95rem;
+      color: #b45309;
+    }
+  </style>
+</head>
+<body>
+  <div class="panel">
+    <h1>Monitoramento</h1>
+
+    <h2>BMP280</h2>
+    <p>Temperatura: <span id="temperature">--</span> °C</p>
+    <p>Pressão: <span id="pressure">--</span> Pa</p>
+    <p>Altitude: <span id="altitude">--</span> m</p>
+
+    <h2>DHT</h2>
+    <p>Temperatura: <span id="dht-temperature">--</span> °C</p>
+    <p>Umidade: <span id="dht-humidity">--</span> %</p>
+    <p id="dht-status">--</p>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    const socket = io();
+
+    function formatValue(value) {
+      return value == null ? "--" : value;
+    }
+
+    socket.on("bmp280-data", (data) => {
+      document.getElementById("temperature").innerText = formatValue(data.temperature);
+      document.getElementById("pressure").innerText = formatValue(data.pressure);
+      document.getElementById("altitude").innerText = formatValue(data.altitude);
+      document.getElementById("dht-temperature").innerText = formatValue(data.dhtTemperature);
+      document.getElementById("dht-humidity").innerText = formatValue(data.dhtHumidity);
+      document.getElementById("dht-status").innerText = data.dhtStatus || "--";
+    });
+  </script>
+</body>
+</html>

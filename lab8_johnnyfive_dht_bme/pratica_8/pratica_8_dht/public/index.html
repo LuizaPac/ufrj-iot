@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+  <title>Monitoramento BME280 + DHT22</title>
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      background: #f3f4f6;
+      color: #111827;
+      padding: 30px;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 20px;
+    }
+
+    .card {
+      background: white;
+      border-radius: 14px;
+      padding: 24px;
+
+      box-shadow:
+        0 10px 25px rgba(0,0,0,0.08);
+    }
+
+    .card h2 {
+      margin-bottom: 20px;
+      color: #2563eb;
+    }
+
+    .item {
+      margin-bottom: 16px;
+      font-size: 18px;
+    }
+
+    .label {
+      font-weight: bold;
+    }
+
+    .value {
+      color: #111827;
+    }
+
+    .status {
+      margin-top: 15px;
+      padding: 12px;
+      border-radius: 8px;
+      background: #fef3c7;
+      color: #92400e;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .online {
+      color: #16a34a;
+      font-weight: bold;
+    }
+
+    .offline {
+      color: #dc2626;
+      font-weight: bold;
+    }
+  </style>
+</head>
+
+<body>
+
+  <h1>Monitoramento de Sensores</h1>
+
+  <div class="container">
+
+    <!-- BME280 -->
+    <div class="card">
+      <h2>BME280</h2>
+
+      <div class="item">
+        <span class="label">Temperatura:</span>
+        <span class="value" id="temperature">--</span> °C
+      </div>
+
+      <div class="item">
+        <span class="label">Pressão:</span>
+        <span class="value" id="pressure">--</span> hPa
+      </div>
+
+      <div class="item">
+        <span class="label">Altitude:</span>
+        <span class="value" id="altitude">--</span> m
+      </div>
+
+      <div class="item">
+        <span class="label">Status:</span>
+        <span class="online">ONLINE</span>
+      </div>
+    </div>
+
+    <!-- DHT22 -->
+    <div class="card">
+      <h2>DHT22</h2>
+
+      <div class="item">
+        <span class="label">Temperatura:</span>
+        <span class="value" id="dhtTemperature">--</span> °C
+      </div>
+
+      <div class="item">
+        <span class="label">Umidade:</span>
+        <span class="value" id="dhtHumidity">--</span> %
+      </div>
+
+      <div class="status" id="dhtStatus">
+        Aguardando dados...
+      </div>
+    </div>
+
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+
+  <script>
+    const socket = io();
+
+    socket.on("connect", () => {
+      console.log("Conectado ao servidor");
+    });
+
+    socket.on("bmp280-data", (data) => {
+
+      // BME280
+      document.getElementById("temperature").innerText =
+        data.temperature ?? "--";
+
+      document.getElementById("pressure").innerText =
+        data.pressure ?? "--";
+
+      document.getElementById("altitude").innerText =
+        data.altitude ?? "--";
+
+      // DHT22
+      document.getElementById("dhtTemperature").innerText =
+        data.dhtTemperature ?? "--";
+
+      document.getElementById("dhtHumidity").innerText =
+        data.dhtHumidity ?? "--";
+
+      document.getElementById("dhtStatus").innerText =
+        data.dhtStatus ?? "--";
+    });
+
+    socket.on("disconnect", () => {
+      console.log("Servidor desconectado");
+    });
+  </script>
+
+</body>
+</html>

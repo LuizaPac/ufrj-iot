@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Controle Blink</title>
+</head>
+<body>
+
+  <h1>Controle de Blink</h1>
+
+  <input type="range" id="slider" min="100" max="2000" value="500">
+
+  <p>Velocidade: <span id="value">500</span> ms</p>
+
+  <script src="/socket.io/socket.io.js"></script>
+
+  <script>
+    const socket = io();
+
+    const slider = document.getElementById("slider");
+    const valueText = document.getElementById("value");
+
+    slider.addEventListener("input", () => {
+      valueText.innerText = slider.value;
+
+      socket.emit("blinkSpeed", slider.value);
+    });
+  </script>
+
+</body>
+</html>

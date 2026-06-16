@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>BME280</title>
+</head>
+<body>
+
+<h1>Monitoramento BME280</h1>
+
+<p>Temperatura: <span id="temp">--</span> °C</p>
+<p>Pressão: <span id="press">--</span> hPa</p>
+<p>Altitude: <span id="alt">--</span> m</p>
+
+<script src="/socket.io/socket.io.js"></script>
+
+<script>
+  const socket = io();
+
+  socket.on("dadosSensor", (dados) => {
+    document.getElementById("temp").innerText =
+      dados.temperatura.toFixed(2);
+
+    document.getElementById("press").innerText =
+      dados.pressao.toFixed(2);
+
+    document.getElementById("alt").innerText =
+      dados.altitude.toFixed(2);
+  });
+</script>
+
+</body>
+</html>
