@@ -1,1 +1,1117 @@
-[{"id":"d78da4550da9bf2a","type":"tab","label":"Fluxo Principal","disabled":false,"info":""},{"id":"4e063c3c91d51c80","type":"aedes broker","z":"d78da4550da9bf2a","name":"","mqtt_port":1883,"mqtt_ws_bind":"port","mqtt_ws_port":"","mqtt_ws_path":"","cert":"","key":"","certname":"","keyname":"","persistence_bind":"memory","dburl":"","usetls":false,"x":190,"y":240,"wires":[[],[]]},{"id":"533a9e8630a1348f","type":"mqtt in","z":"d78da4550da9bf2a","name":"","topic":"casa/temperatura","qos":"2","datatype":"auto-detect","broker":"mqtt_broker","nl":false,"rap":true,"rh":0,"inputs":0,"x":320,"y":40,"wires":[["93542476682fa4a8"]]},{"id":"93542476682fa4a8","type":"json","z":"d78da4550da9bf2a","name":"","property":"payload","action":"","pretty":false,"x":470,"y":200,"wires":[["2bf5586eda76e99f","a877ac2d6553ee80","c3b86992153baf91","29977436f8cd0d7a"]]},{"id":"2bf5586eda76e99f","type":"function","z":"d78da4550da9bf2a","name":"alarm_control","func":"const temperatura = msg.payload;\n\nif(Number(temperatura) > 24){\n    msg.payload = \"ON\";\n   // msg.payload = Number(msg.payload);\n}\nelse{\nmsg.payload = \"OFF\";\n}\nreturn msg;\n\n\n","outputs":1,"timeout":0,"noerr":0,"initialize":"","finalize":"","libs":[],"x":700,"y":120,"wires":[["9a02951b75cd9ccb"]]},{"id":"9a02951b75cd9ccb","type":"mqtt out","z":"d78da4550da9bf2a","name":"","topic":"casa/alarme","qos":"0","retain":"false","respTopic":"","contentType":"","userProps":"","correl":"","expiry":"","broker":"mqtt_broker","x":910,"y":120,"wires":[]},{"id":"a877ac2d6553ee80","type":"debug","z":"d78da4550da9bf2a","name":"debug 1","active":false,"tosidebar":true,"console":false,"tostatus":false,"complete":"payload","targetType":"msg","statusVal":"","statusType":"auto","x":660,"y":60,"wires":[]},{"id":"6f34ab7012467b72","type":"telegram sender","z":"d78da4550da9bf2a","name":"","bot":"4b744b03e8ba1873","haserroroutput":false,"outputs":1,"x":930,"y":180,"wires":[[]]},{"id":"9f444967beac12c6","type":"telegram receiver","z":"d78da4550da9bf2a","name":"","bot":"4b744b03e8ba1873","saveDataDir":"","filterCommands":false,"hasinput":false,"inputs":0,"handleallupdates":false,"handleprocessupdates":false,"x":1150,"y":180,"wires":[["b142ae27925072bb"],[]]},{"id":"b142ae27925072bb","type":"debug","z":"d78da4550da9bf2a","name":"debug 2","active":false,"tosidebar":true,"console":false,"tostatus":false,"complete":"false","statusVal":"","statusType":"auto","x":1340,"y":180,"wires":[]},{"id":"c3b86992153baf91","type":"function","z":"d78da4550da9bf2a","name":"telem_control","func":"const temperatura = msg.payload;\n\nif(Number(temperatura) > 24){\n    msg.payload = {\n        chatId:917451988,\n        type:\"message\",\n        content:\"Temperatura alta!\"\n    };\n    return msg;\n}\n\n","outputs":1,"timeout":0,"noerr":0,"initialize":"","finalize":"","libs":[],"x":700,"y":180,"wires":[["6f34ab7012467b72"]]},{"id":"3b22e161894fe5bf","type":"ui-chart","z":"d78da4550da9bf2a","group":"26dffc44745e02e8","name":"","label":"chart","order":1,"chartType":"line","category":"topic","categoryType":"msg","xAxisLabel":"Tempo","xAxisProperty":"","xAxisPropertyType":"timestamp","xAxisType":"time","xAxisFormat":"","xAxisFormatType":"auto","xmin":"","xmax":"","yAxisLabel":"Temperatura","yAxisProperty":"payload","yAxisPropertyType":"msg","ymin":"0","ymax":"100","bins":10,"action":"append","stackSeries":false,"pointShape":"circle","pointRadius":4,"showLegend":true,"removeOlder":1,"removeOlderUnit":"3600","removeOlderPoints":"","colors":["#0095ff","#ff0000","#ff7f0e","#2ca02c","#a347e1","#d62728","#ff9896","#9467bd","#c5b0d5"],"textColor":["#666666"],"textColorDefault":true,"gridColor":["#e5e5e5"],"gridColorDefault":true,"width":6,"height":8,"className":"","interpolation":"linear","x":1330,"y":260,"wires":[[]]},{"id":"29977436f8cd0d7a","type":"function","z":"d78da4550da9bf2a","name":"convert_temp","func":"let c = Number(msg.payload);\n\nmsg.fahrenheit = c*9/5 + 32;\nmsg.celsius = c;\n\nreturn msg;","outputs":1,"timeout":0,"noerr":0,"initialize":"","finalize":"","libs":[],"x":700,"y":260,"wires":[["82d3301940328521","08b93aeaae0144f4"]]},{"id":"fdf1541826de3d61","type":"ui-switch","z":"d78da4550da9bf2a","name":"switch_temp_type","label":"C° x F°","group":"26dffc44745e02e8","order":0,"width":0,"height":0,"passthru":false,"decouple":false,"topic":"payload","topicType":"msg","style":"","className":"","layout":"row-spread","clickableArea":"switch","onvalue":"true","onvalueType":"bool","onicon":"","oncolor":"","offvalue":"false","offvalueType":"bool","officon":"","offcolor":"","x":1190,"y":480,"wires":[["5f694dbfea7a0396"]]},{"id":"5f694dbfea7a0396","type":"function","z":"d78da4550da9bf2a","name":"switch_temp_type","func":"let useF = msg.payload;\n\nflow.set(\"useF\", useF);\n\nlet history = flow.get(\"history\") || [];\n\nlet data = [];\n\nhistory.forEach(p => {\n    data.push({\n        x: p.t,\n        y: useF ? p.f:p.c\n    });\n});\n\nmsg.payload = data;\nreturn msg;\n","outputs":1,"timeout":0,"noerr":0,"initialize":"","finalize":"","libs":[],"x":1130,"y":260,"wires":[["3b22e161894fe5bf","193cca15a4c72a30"]]},{"id":"82d3301940328521","type":"function","z":"d78da4550da9bf2a","name":"get_history","func":"let history = flow.get(\"history\") || [];\n \n history.push({\n    c: msg.celsius,\n    f: msg.fahrenheit,\n    t: Date.now()\n });\n\n if (history.lenght > 500){\n    history.shift();\n }\n\n flow.set(\"history\",history);\n\n return msg;","outputs":1,"timeout":0,"noerr":0,"initialize":"","finalize":"","libs":[],"x":910,"y":260,"wires":[["5f694dbfea7a0396","01be7a41a957aab2"]]},{"id":"08b93aeaae0144f4","type":"debug","z":"d78da4550da9bf2a","name":"current_temp","active":false,"tosidebar":true,"console":false,"tostatus":false,"complete":"true","targetType":"full","statusVal":"","statusType":"auto","x":690,"y":300,"wires":[]},{"id":"193cca15a4c72a30","type":"debug","z":"d78da4550da9bf2a","name":"debug 4","active":false,"tosidebar":true,"console":false,"tostatus":false,"complete":"false","statusVal":"","statusType":"auto","x":1340,"y":320,"wires":[]},{"id":"01be7a41a957aab2","type":"debug","z":"d78da4550da9bf2a","name":"current_history","active":true,"tosidebar":true,"console":false,"tostatus":false,"complete":"true","targetType":"full","statusVal":"","statusType":"auto","x":920,"y":320,"wires":[]},{"id":"mqtt_broker","type":"mqtt-broker","name":"Aedes Broker","broker":"localhost","port":"1883","clientid":"","autoConnect":true,"usetls":false,"protocolVersion":"4","keepalive":"60","cleansession":true,"autoUnsubscribe":true,"birthTopic":"","birthQos":"0","birthPayload":"","birthMsg":{},"closeTopic":"","closePayload":"","closeMsg":{},"willTopic":"","willQos":"0","willPayload":"","willMsg":{},"userProps":"","sessionExpiry":""},{"id":"4b744b03e8ba1873","type":"telegram bot","botname":"t.me/iot_pratica_bot","usernames":"","chatids":"","baseapiurl":"","testenvironment":false,"updatemode":"polling","pollinterval":"300","usesocks":false,"sockshost":"","socksprotocol":"socks5","socksport":"6667","socksusername":"anonymous","sockspassword":"","bothost":"","botpath":"","localbothost":"0.0.0.0","localbotport":"8443","publicbotport":"8443","privatekey":"","certificate":"","useselfsignedcertificate":false,"sslterminated":false,"verboselogging":false},{"id":"26dffc44745e02e8","type":"ui-group","name":"Temperatura","page":"083642fbc6eac964","width":"6","height":"1","order":1,"showTitle":true,"className":"","visible":"true","disabled":"false","groupType":"default"},{"id":"083642fbc6eac964","type":"ui-page","name":"Sensores","ui":"57f64857745bb674","path":"/page1","icon":"home","layout":"grid","theme":"3de793bb20f9f813","breakpoints":[{"name":"Default","px":"0","cols":"3"},{"name":"Tablet","px":"576","cols":"6"},{"name":"Small Desktop","px":"768","cols":"9"},{"name":"Desktop","px":"1024","cols":"12"}],"order":1,"className":"","visible":"true","disabled":"false"},{"id":"57f64857745bb674","type":"ui-base","name":"My Dashboard","path":"/dashboard","appIcon":"","includeClientData":true,"acceptsClientConfig":["ui-notification","ui-control"],"showPathInSidebar":false,"headerContent":"page","navigationStyle":"default","titleBarStyle":"default","showReconnectNotification":true,"notificationDisplayTime":1,"showDisconnectNotification":true,"allowInstall":false},{"id":"3de793bb20f9f813","type":"ui-theme","name":"Default Theme","colors":{"surface":"#ffffff","primary":"#0094CE","bgPage":"#eeeeee","groupBg":"#ffffff","groupOutline":"#cccccc"},"sizes":{"density":"default","pagePadding":"12px","groupGap":"12px","groupBorderRadius":"4px","widgetGap":"12px"}}]
+[
+    {
+        "id": "d78da4550da9bf2a",
+        "type": "tab",
+        "label": "Fluxo Principal",
+        "disabled": false,
+        "info": ""
+    },
+    {
+        "id": "533a9e8630a1348f",
+        "type": "mqtt in",
+        "z": "d78da4550da9bf2a",
+        "name": "",
+        "topic": "casa/temperatura",
+        "qos": "2",
+        "datatype": "auto-detect",
+        "broker": "mqtt_broker",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 260,
+        "y": 460,
+        "wires": [
+            [
+                "93542476682fa4a8"
+            ]
+        ]
+    },
+    {
+        "id": "93542476682fa4a8",
+        "type": "json",
+        "z": "d78da4550da9bf2a",
+        "name": "",
+        "property": "payload",
+        "action": "",
+        "pretty": false,
+        "x": 530,
+        "y": 460,
+        "wires": [
+            [
+                "2dd618b768d11720",
+                "a877ac2d6553ee80"
+            ]
+        ]
+    },
+    {
+        "id": "2bf5586eda76e99f",
+        "type": "function",
+        "z": "d78da4550da9bf2a",
+        "name": "alarm_control",
+        "func": "const temperatura = msg.payload;\n\nif(Number(temperatura) > 24){\n    msg.payload = \"ON\";\n   // msg.payload = Number(msg.payload);\n}\nelse{\nmsg.payload = \"OFF\";\n}\nreturn msg;\n\n\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1080,
+        "y": 380,
+        "wires": [
+            [
+                "9a02951b75cd9ccb"
+            ]
+        ]
+    },
+    {
+        "id": "9a02951b75cd9ccb",
+        "type": "mqtt out",
+        "z": "d78da4550da9bf2a",
+        "name": "",
+        "topic": "casa/alarme",
+        "qos": "0",
+        "retain": "false",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "mqtt_broker",
+        "x": 1290,
+        "y": 380,
+        "wires": []
+    },
+    {
+        "id": "a877ac2d6553ee80",
+        "type": "debug",
+        "z": "d78da4550da9bf2a",
+        "name": "json_debug",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 710,
+        "y": 400,
+        "wires": [],
+        "icon": "font-awesome/fa-thermometer-0"
+    },
+    {
+        "id": "b142ae27925072bb",
+        "type": "debug",
+        "z": "d78da4550da9bf2a",
+        "name": "Telegram_msg",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1740,
+        "y": 200,
+        "wires": [],
+        "icon": "node-red-contrib-telegrambot/telegram_cmd.png"
+    },
+    {
+        "id": "c3b86992153baf91",
+        "type": "function",
+        "z": "d78da4550da9bf2a",
+        "name": "telem_control",
+        "func": "const temperatura = msg.payload;\n\nif(Number(temperatura) > 24){\n    msg.payload = {\n        chatId:917451988,\n        type:\"message\",\n        content:\"Temperatura alta!\"\n    };\n    return msg;\n}\n\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1080,
+        "y": 440,
+        "wires": [
+            [
+                "6f34ab7012467b72"
+            ]
+        ]
+    },
+    {
+        "id": "29977436f8cd0d7a",
+        "type": "function",
+        "z": "d78da4550da9bf2a",
+        "name": "convert_temp",
+        "func": "let celsius = Number(msg.payload);\n\nmsg.fahrenheit = celsius*9/5 + 32;\nmsg.celsius = celsius;\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1080,
+        "y": 560,
+        "wires": [
+            [
+                "82d3301940328521",
+                "08b93aeaae0144f4"
+            ]
+        ]
+    },
+    {
+        "id": "5f694dbfea7a0396",
+        "type": "function",
+        "z": "d78da4550da9bf2a",
+        "name": "set_unit",
+        "func": "flow.set(\"useF\", msg.payload);\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1300,
+        "y": 500,
+        "wires": [
+            [
+                "6615b59944cbec28"
+            ]
+        ]
+    },
+    {
+        "id": "82d3301940328521",
+        "type": "function",
+        "z": "d78da4550da9bf2a",
+        "name": "get_history",
+        "func": "let history = flow.get(\"history\") || [];\n \n history.push({\n    c: msg.celsius,\n    f: msg.fahrenheit,\n    t: Date.now()\n });\n\n if (history.length > 500){\n    history.shift();\n }\n\n flow.set(\"history\",history);\n\n return msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1290,
+        "y": 560,
+        "wires": [
+            [
+                "6615b59944cbec28",
+                "43baf2fe6b70baa7"
+            ]
+        ]
+    },
+    {
+        "id": "08b93aeaae0144f4",
+        "type": "debug",
+        "z": "d78da4550da9bf2a",
+        "name": "current_temp",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1070,
+        "y": 620,
+        "wires": [],
+        "icon": "font-awesome/fa-thermometer-4"
+    },
+    {
+        "id": "9f444967beac12c6",
+        "type": "telegram receiver",
+        "z": "d78da4550da9bf2a",
+        "d": true,
+        "name": "",
+        "bot": "4b744b03e8ba1873",
+        "saveDataDir": "",
+        "filterCommands": false,
+        "hasinput": false,
+        "inputs": 0,
+        "handleallupdates": false,
+        "handleprocessupdates": false,
+        "x": 1750,
+        "y": 260,
+        "wires": [
+            [
+                "b142ae27925072bb"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "6f34ab7012467b72",
+        "type": "telegram sender",
+        "z": "d78da4550da9bf2a",
+        "d": true,
+        "name": "",
+        "bot": "4b744b03e8ba1873",
+        "haserroroutput": false,
+        "outputs": 1,
+        "x": 1750,
+        "y": 440,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "4e063c3c91d51c80",
+        "type": "aedes broker",
+        "z": "d78da4550da9bf2a",
+        "name": "",
+        "mqtt_port": 1883,
+        "mqtt_ws_bind": "port",
+        "mqtt_ws_port": "",
+        "mqtt_ws_path": "",
+        "cert": "",
+        "key": "",
+        "certname": "",
+        "keyname": "",
+        "persistence_bind": "memory",
+        "dburl": "",
+        "usetls": false,
+        "x": 250,
+        "y": 200,
+        "wires": [
+            [],
+            []
+        ]
+    },
+    {
+        "id": "fdf1541826de3d61",
+        "type": "ui-switch",
+        "z": "d78da4550da9bf2a",
+        "name": "switch_temp_type",
+        "label": "C° x F°",
+        "group": "26dffc44745e02e8",
+        "order": 0,
+        "width": 0,
+        "height": 0,
+        "passthru": false,
+        "decouple": false,
+        "topic": "payload",
+        "topicType": "msg",
+        "style": "",
+        "className": "",
+        "layout": "row-spread",
+        "clickableArea": "switch",
+        "onvalue": "true",
+        "onvalueType": "bool",
+        "onicon": "",
+        "oncolor": "",
+        "offvalue": "false",
+        "offvalueType": "bool",
+        "officon": "",
+        "offcolor": "",
+        "x": 1090,
+        "y": 500,
+        "wires": [
+            [
+                "5f694dbfea7a0396"
+            ]
+        ]
+    },
+    {
+        "id": "3b22e161894fe5bf",
+        "type": "ui-chart",
+        "z": "d78da4550da9bf2a",
+        "group": "26dffc44745e02e8",
+        "name": "",
+        "label": "chart_temperature",
+        "order": 1,
+        "chartType": "line",
+        "category": "topic",
+        "categoryType": "msg",
+        "xAxisLabel": "Tempo",
+        "xAxisProperty": "x",
+        "xAxisPropertyType": "property",
+        "xAxisType": "time",
+        "xAxisFormat": "",
+        "xAxisFormatType": "auto",
+        "xmin": "",
+        "xmax": "",
+        "yAxisLabel": "Temperatura",
+        "yAxisProperty": "y",
+        "yAxisPropertyType": "property",
+        "ymin": "20",
+        "ymax": "100",
+        "bins": 10,
+        "action": "replace",
+        "stackSeries": false,
+        "pointShape": "circle",
+        "pointRadius": 4,
+        "showLegend": true,
+        "removeOlder": 1,
+        "removeOlderUnit": "3600",
+        "removeOlderPoints": "",
+        "colors": [
+            "#0095ff",
+            "#ff0000",
+            "#ff7f0e",
+            "#2ca02c",
+            "#a347e1",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "textColor": [
+            "#666666"
+        ],
+        "textColorDefault": true,
+        "gridColor": [
+            "#e5e5e5"
+        ],
+        "gridColorDefault": true,
+        "width": 6,
+        "height": 8,
+        "className": "",
+        "interpolation": "linear",
+        "x": 1750,
+        "y": 560,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "e371cc2efc257a50",
+        "type": "inject",
+        "z": "d78da4550da9bf2a",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "1",
+        "crontab": "",
+        "once": true,
+        "onceDelay": "1",
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 510,
+        "y": 200,
+        "wires": [
+            [
+                "32b65c1c3172d4a2"
+            ]
+        ]
+    },
+    {
+        "id": "2dd618b768d11720",
+        "type": "function",
+        "z": "d78da4550da9bf2a",
+        "name": "store_last_temp",
+        "func": "let temperatura = Number(msg.payload);\n\nflow.set(\"last_mqtt_temp\", temperatura);\nflow.set(\"last_mqtt_time\", Date.now());\n\nmsg.payload = temperatura;\nmsg.topic = \"temperatura\";\nmsg.source = \"mqtt\";\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 700,
+        "y": 460,
+        "wires": [
+            [
+                "5023006f92a49768"
+            ]
+        ]
+    },
+    {
+        "id": "454def5908709b47",
+        "type": "function",
+        "z": "d78da4550da9bf2a",
+        "name": "mocked_temp",
+        "func": "const now = Date.now();\nconst lastMqttTime = flow.get(\"last_mqtt_time\") || 0;\n\nconst timeout = 10000; // 3 segundos sem MQTT = usar mock\n\nif (now - lastMqttTime < timeout) {\n    return null;\n}\n\nconst t = now / 1000;\nconst periodo = 10;\n\nconst temperatura = 28 + 3 * Math.sin(2 * Math.PI * t / periodo);\n\nmsg.payload = temperatura;\nmsg.topic = \"temperatura\";\nmsg.source = \"mock\";\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 700,
+        "y": 520,
+        "wires": [
+            [
+                "d9caca98afcee38c"
+            ]
+        ]
+    },
+    {
+        "id": "d9caca98afcee38c",
+        "type": "link out",
+        "z": "d78da4550da9bf2a",
+        "name": "temp_in",
+        "mode": "link",
+        "links": [
+            "b06c65ec8e58812b"
+        ],
+        "x": 815,
+        "y": 520,
+        "wires": []
+    },
+    {
+        "id": "b06c65ec8e58812b",
+        "type": "link in",
+        "z": "d78da4550da9bf2a",
+        "name": "temp_in",
+        "links": [
+            "d9caca98afcee38c",
+            "5023006f92a49768"
+        ],
+        "x": 905,
+        "y": 500,
+        "wires": [
+            [
+                "2bf5586eda76e99f",
+                "c3b86992153baf91",
+                "29977436f8cd0d7a"
+            ]
+        ]
+    },
+    {
+        "id": "5023006f92a49768",
+        "type": "link out",
+        "z": "d78da4550da9bf2a",
+        "name": "temp_in",
+        "mode": "link",
+        "links": [
+            "b06c65ec8e58812b"
+        ],
+        "x": 815,
+        "y": 460,
+        "wires": []
+    },
+    {
+        "id": "6615b59944cbec28",
+        "type": "function",
+        "z": "d78da4550da9bf2a",
+        "name": "render_chart",
+        "func": "const useF = flow.get(\"useF\") || false;\nconst history = flow.get(\"history\") || [];\n\nconst unidade = useF ? \"°F\" : \"°C\";\nconst label = useF ? \"Temperatura em Fahrenheit\" : \"Temperatura em Celsius\";\n\nmsg.payload = history.map(p => ({\n    x: p.t,\n    y: useF ? p.f : p.c\n}));\n\nmsg.topic = label;\nmsg.action = \"replace\";\n\nmsg.ui_update = {\n    label: `Histórico de Temperatura (${unidade})`,\n    yAxisLabel: `Temperatura (${unidade})`,\n    ymin: useF ? 60 : 20,\n    ymax: useF ? 110 : 40,\n    chartOptions: {\n        tooltip: {\n            trigger: \"axis\",\n            valueFormatter: value => `${Number(value).toFixed(1)} ${unidade}`\n        }\n    }\n};\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1530,
+        "y": 560,
+        "wires": [
+            [
+                "3b22e161894fe5bf"
+            ]
+        ]
+    },
+    {
+        "id": "32b65c1c3172d4a2",
+        "type": "link out",
+        "z": "d78da4550da9bf2a",
+        "name": "time_stamp",
+        "mode": "link",
+        "links": [
+            "5b2e806b811bfded",
+            "fa869be145f7e141",
+            "9e98df7b960fca84",
+            "1c8dff8f1356ff9f"
+        ],
+        "x": 625,
+        "y": 200,
+        "wires": []
+    },
+    {
+        "id": "5b2e806b811bfded",
+        "type": "link in",
+        "z": "d78da4550da9bf2a",
+        "name": "time_stamp",
+        "links": [
+            "32b65c1c3172d4a2"
+        ],
+        "x": 575,
+        "y": 520,
+        "wires": [
+            [
+                "454def5908709b47"
+            ]
+        ]
+    },
+    {
+        "id": "3b94a7cc68f50e72",
+        "type": "ui-gauge",
+        "z": "d78da4550da9bf2a",
+        "name": "gauge_temperature",
+        "group": "26dffc44745e02e8",
+        "order": 0,
+        "value": "payload",
+        "valueType": "msg",
+        "width": 3,
+        "height": 3,
+        "gtype": "gauge-half",
+        "gstyle": "needle",
+        "title": "gauge",
+        "alwaysShowTitle": false,
+        "floatingTitlePosition": "top-left",
+        "units": "units",
+        "icon": "",
+        "prefix": "",
+        "suffix": "",
+        "segments": [
+            {
+                "from": "0",
+                "color": "#5cd65c",
+                "text": "",
+                "textType": "label"
+            },
+            {
+                "from": "4",
+                "color": "#ffc800",
+                "text": "",
+                "textType": "label"
+            },
+            {
+                "from": "7",
+                "color": "#ea5353",
+                "text": "",
+                "textType": "label"
+            }
+        ],
+        "min": 0,
+        "max": "10",
+        "sizeThickness": 16,
+        "sizeGap": 4,
+        "sizeKeyThickness": 8,
+        "styleRounded": true,
+        "styleGlow": false,
+        "className": "",
+        "x": 1750,
+        "y": 640,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "43baf2fe6b70baa7",
+        "type": "function",
+        "z": "d78da4550da9bf2a",
+        "name": "render_gauge",
+        "func": "const useF = flow.get(\"useF\") || false;\nconst history = flow.get(\"history\") || [];\n\nconst lastTemps = history.slice(-7);\n\nif (lastTemps.length === 0) {\n    return null;\n}\n\nconst values = lastTemps.map(p => useF ? p.f : p.c);\n\nconst sum = values.reduce((acc, value) => acc + value, 0);\nconst avg = sum / values.length;\n\nmsg.payload = Number(avg.toFixed(1));\n\nmsg.ui_update = {\n    label: \"Média das últimas 7 temperaturas\",\n    units: useF ? \"°F\" : \"°C\",\n    min: useF ? 60 : 20,\n    max: useF ? 110 : 40\n};\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1540,
+        "y": 640,
+        "wires": [
+            [
+                "3b94a7cc68f50e72"
+            ]
+        ]
+    },
+    {
+        "id": "2d6ecc58b1c6aeee",
+        "type": "mqtt in",
+        "z": "d78da4550da9bf2a",
+        "name": "",
+        "topic": "casa/umidade",
+        "qos": "2",
+        "datatype": "auto-detect",
+        "broker": "mqtt_broker",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 270,
+        "y": 760,
+        "wires": [
+            [
+                "076dd56fd2649396"
+            ]
+        ]
+    },
+    {
+        "id": "076dd56fd2649396",
+        "type": "json",
+        "z": "d78da4550da9bf2a",
+        "name": "",
+        "property": "payload",
+        "action": "",
+        "pretty": false,
+        "x": 550,
+        "y": 760,
+        "wires": [
+            [
+                "e1e5b44c9b407758"
+            ]
+        ]
+    },
+    {
+        "id": "e1e5b44c9b407758",
+        "type": "function",
+        "z": "d78da4550da9bf2a",
+        "name": "store_last_humid",
+        "func": "const humidity = Number(msg.payload);\n\nflow.set(\"last_humidity_time\", Date.now());\n\nmsg.payload = humidity;\nmsg.topic = \"umidade\";\nmsg.source = \"mqtt\";\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 730,
+        "y": 760,
+        "wires": [
+            [
+                "8ea79b33a47fecde"
+            ]
+        ]
+    },
+    {
+        "id": "8ea79b33a47fecde",
+        "type": "link out",
+        "z": "d78da4550da9bf2a",
+        "name": "umid_in",
+        "mode": "link",
+        "links": [
+            "6e5751471da8e99f"
+        ],
+        "x": 855,
+        "y": 760,
+        "wires": []
+    },
+    {
+        "id": "6e5751471da8e99f",
+        "type": "link in",
+        "z": "d78da4550da9bf2a",
+        "name": "umid_in",
+        "links": [
+            "8ea79b33a47fecde",
+            "f38a4050c6b4190c"
+        ],
+        "x": 935,
+        "y": 760,
+        "wires": [
+            [
+                "53ba64d66509ecc7"
+            ]
+        ]
+    },
+    {
+        "id": "53ba64d66509ecc7",
+        "type": "function",
+        "z": "d78da4550da9bf2a",
+        "name": "convert_umid",
+        "func": "const kgm3 = Number(msg.payload);\n\n// 1 kg/m3 = 0.06242796 lb/ft3\nconst lbft3 = kgm3 * 0.06242796;\n\nmsg.humidity = {\n    kgm3: kgm3,\n    lbft3: lbft3,\n    relative: msg.relativeHumidity\n};\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1080,
+        "y": 760,
+        "wires": [
+            [
+                "4b27a55823dc5fd4"
+            ]
+        ]
+    },
+    {
+        "id": "a5942d7e1ea78449",
+        "type": "ui-button-group",
+        "z": "d78da4550da9bf2a",
+        "name": "",
+        "group": "aa5772b77cbd5b98",
+        "order": 0,
+        "width": 6,
+        "height": 1,
+        "label": "button group",
+        "className": "",
+        "rounded": true,
+        "useThemeColors": true,
+        "passthru": false,
+        "options": [
+            {
+                "label": "kg/m³",
+                "icon": "",
+                "value": "option_0",
+                "valueType": "str",
+                "color": "#009933"
+            },
+            {
+                "label": "lb/ft³",
+                "icon": "",
+                "value": "option_1",
+                "valueType": "str",
+                "color": "#999999"
+            },
+            {
+                "label": "relativa",
+                "icon": "",
+                "value": "option_2",
+                "valueType": "str",
+                "color": "#ff6666"
+            }
+        ],
+        "topic": "topic",
+        "topicType": "msg",
+        "x": 1090,
+        "y": 700,
+        "wires": [
+            [
+                "7f6f94a512d38c54"
+            ]
+        ]
+    },
+    {
+        "id": "7f6f94a512d38c54",
+        "type": "function",
+        "z": "d78da4550da9bf2a",
+        "name": "set_unit",
+        "func": "flow.set(\"humidityUnit\", msg.payload);\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1280,
+        "y": 700,
+        "wires": [
+            [
+                "4b27a55823dc5fd4"
+            ]
+        ]
+    },
+    {
+        "id": "4b27a55823dc5fd4",
+        "type": "function",
+        "z": "d78da4550da9bf2a",
+        "name": "render_gauge",
+        "func": "const unit = flow.get(\"humidityUnit\") || \"kgm3\";\n\nlet humidity = msg.humidity;\n\nif (!humidity) {\n    humidity = flow.get(\"last_humidity_values\");\n}\n\nif (!humidity) {\n    return null;\n}\n\nflow.set(\"last_humidity_values\", humidity);\n\nif (unit === \"lbft3\") {\n    msg.payload = Number(humidity.lbft3.toFixed(5));\n\n    msg.ui_update = {\n        label: \"Umidade absoluta\",\n        units: \"lb/ft³\",\n        min: 0,\n        max: 0.002\n    };\n\n    return msg;\n}\n\nif (unit === \"relative\") {\n    if (humidity.relative === undefined) {\n        return null;\n    }\n\n    msg.payload = Number(humidity.relative.toFixed(1));\n\n    msg.ui_update = {\n        label: \"Umidade relativa\",\n        units: \"%\",\n        min: 0,\n        max: 100\n    };\n\n    return msg;\n}\n\nmsg.payload = Number(humidity.kgm3.toFixed(4));\n\nmsg.ui_update = {\n    label: \"Umidade absoluta\",\n    units: \"kg/m³\",\n    min: 0,\n    max: 0.03\n};\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1480,
+        "y": 760,
+        "wires": [
+            [
+                "3b236c86edf5bbd0"
+            ]
+        ]
+    },
+    {
+        "id": "3b236c86edf5bbd0",
+        "type": "ui-gauge",
+        "z": "d78da4550da9bf2a",
+        "name": "gauge_temperature",
+        "group": "aa5772b77cbd5b98",
+        "order": 0,
+        "value": "payload",
+        "valueType": "msg",
+        "width": 3,
+        "height": 3,
+        "gtype": "gauge-half",
+        "gstyle": "needle",
+        "title": "gauge",
+        "alwaysShowTitle": false,
+        "floatingTitlePosition": "top-left",
+        "units": "units",
+        "icon": "",
+        "prefix": "",
+        "suffix": "",
+        "segments": [
+            {
+                "from": "0",
+                "color": "#5cd65c",
+                "text": "",
+                "textType": "label"
+            },
+            {
+                "from": "4",
+                "color": "#ffc800",
+                "text": "",
+                "textType": "label"
+            },
+            {
+                "from": "7",
+                "color": "#ea5353",
+                "text": "",
+                "textType": "label"
+            }
+        ],
+        "min": 0,
+        "max": "10",
+        "sizeThickness": 16,
+        "sizeGap": 4,
+        "sizeKeyThickness": 8,
+        "styleRounded": true,
+        "styleGlow": false,
+        "className": "",
+        "x": 1710,
+        "y": 760,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "90a03ff49a5c2467",
+        "type": "function",
+        "z": "d78da4550da9bf2a",
+        "name": "mocked_humid",
+        "func": "const now = Date.now();\nconst lastHumidityTime = flow.get(\"last_humidity_time\") || 0;\n\nconst timeout = 3000;\n\nif (now - lastHumidityTime < timeout) {\n    return null;\n}\n\nconst t = now / 1000;\nconst periodo = 10;\n\n// Mock de umidade absoluta em kg/m3.\n// Valor típico aproximado em ar ambiente: algo entre 0.005 e 0.025 kg/m3.\nconst humidityKgM3 = 0.014 + 0.004 * Math.sin(2 * Math.PI * t / periodo);\n\n// Mock de umidade relativa, independente, apenas para teste visual.\nconst relativeHumidity = 60 + 20 * Math.sin(2 * Math.PI * t / periodo);\n\nmsg.payload = humidityKgM3;\nmsg.relativeHumidity = relativeHumidity;\nmsg.topic = \"umidade\";\nmsg.source = \"mock\";\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 740,
+        "y": 820,
+        "wires": [
+            [
+                "f38a4050c6b4190c"
+            ]
+        ]
+    },
+    {
+        "id": "f38a4050c6b4190c",
+        "type": "link out",
+        "z": "d78da4550da9bf2a",
+        "name": "umid_in",
+        "mode": "link",
+        "links": [
+            "6e5751471da8e99f"
+        ],
+        "x": 855,
+        "y": 820,
+        "wires": []
+    },
+    {
+        "id": "1c8dff8f1356ff9f",
+        "type": "link in",
+        "z": "d78da4550da9bf2a",
+        "name": "time_stamp",
+        "links": [
+            "32b65c1c3172d4a2"
+        ],
+        "x": 615,
+        "y": 820,
+        "wires": [
+            [
+                "90a03ff49a5c2467"
+            ]
+        ]
+    },
+    {
+        "id": "mqtt_broker",
+        "type": "mqtt-broker",
+        "name": "Aedes Broker",
+        "broker": "localhost",
+        "port": "1883",
+        "clientid": "",
+        "autoConnect": true,
+        "usetls": false,
+        "protocolVersion": "4",
+        "keepalive": "60",
+        "cleansession": true,
+        "autoUnsubscribe": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": "",
+        "willMsg": {},
+        "userProps": "",
+        "sessionExpiry": ""
+    },
+    {
+        "id": "4b744b03e8ba1873",
+        "type": "telegram bot",
+        "botname": "t.me/iot_pratica_bot",
+        "usernames": "",
+        "chatids": "",
+        "baseapiurl": "",
+        "testenvironment": false,
+        "updatemode": "polling",
+        "pollinterval": "300",
+        "usesocks": false,
+        "sockshost": "",
+        "socksprotocol": "socks5",
+        "socksport": "6667",
+        "socksusername": "anonymous",
+        "sockspassword": "",
+        "bothost": "",
+        "botpath": "",
+        "localbothost": "0.0.0.0",
+        "localbotport": "8443",
+        "publicbotport": "8443",
+        "privatekey": "",
+        "certificate": "",
+        "useselfsignedcertificate": false,
+        "sslterminated": false,
+        "verboselogging": false
+    },
+    {
+        "id": "26dffc44745e02e8",
+        "type": "ui-group",
+        "name": "Temperatura",
+        "page": "083642fbc6eac964",
+        "width": "6",
+        "height": "1",
+        "order": 1,
+        "showTitle": true,
+        "className": "",
+        "visible": "true",
+        "disabled": "false",
+        "groupType": "default"
+    },
+    {
+        "id": "aa5772b77cbd5b98",
+        "type": "ui-group",
+        "name": "Umidade",
+        "page": "8e5d05f096751562",
+        "width": 6,
+        "height": 1,
+        "order": -1,
+        "showTitle": true,
+        "className": "",
+        "visible": "true",
+        "disabled": "false",
+        "groupType": "default"
+    },
+    {
+        "id": "083642fbc6eac964",
+        "type": "ui-page",
+        "name": "Sensores",
+        "ui": "57f64857745bb674",
+        "path": "/page1",
+        "icon": "home",
+        "layout": "grid",
+        "theme": "3de793bb20f9f813",
+        "breakpoints": [
+            {
+                "name": "Default",
+                "px": "0",
+                "cols": "3"
+            },
+            {
+                "name": "Tablet",
+                "px": "576",
+                "cols": "6"
+            },
+            {
+                "name": "Small Desktop",
+                "px": "768",
+                "cols": "9"
+            },
+            {
+                "name": "Desktop",
+                "px": "1024",
+                "cols": "12"
+            }
+        ],
+        "order": 1,
+        "className": "",
+        "visible": "true",
+        "disabled": "false"
+    },
+    {
+        "id": "8e5d05f096751562",
+        "type": "ui-page",
+        "name": "Umidade",
+        "ui": "57f64857745bb674",
+        "path": "/umidade",
+        "icon": "home",
+        "layout": "grid",
+        "theme": "3de793bb20f9f813",
+        "breakpoints": [
+            {
+                "name": "Default",
+                "px": "0",
+                "cols": "3"
+            },
+            {
+                "name": "Tablet",
+                "px": "576",
+                "cols": "6"
+            },
+            {
+                "name": "Small Desktop",
+                "px": "768",
+                "cols": "9"
+            },
+            {
+                "name": "Desktop",
+                "px": "1024",
+                "cols": "12"
+            }
+        ],
+        "order": -1,
+        "className": "",
+        "visible": "true",
+        "disabled": "false"
+    },
+    {
+        "id": "57f64857745bb674",
+        "type": "ui-base",
+        "name": "My Dashboard",
+        "path": "/dashboard",
+        "appIcon": "",
+        "includeClientData": true,
+        "acceptsClientConfig": [
+            "ui-notification",
+            "ui-control"
+        ],
+        "showPathInSidebar": false,
+        "headerContent": "page",
+        "navigationStyle": "default",
+        "titleBarStyle": "default",
+        "showReconnectNotification": true,
+        "notificationDisplayTime": 1,
+        "showDisconnectNotification": true,
+        "allowInstall": false
+    },
+    {
+        "id": "3de793bb20f9f813",
+        "type": "ui-theme",
+        "name": "Default Theme",
+        "colors": {
+            "surface": "#ffffff",
+            "primary": "#0094CE",
+            "bgPage": "#eeeeee",
+            "groupBg": "#ffffff",
+            "groupOutline": "#cccccc"
+        },
+        "sizes": {
+            "density": "default",
+            "pagePadding": "12px",
+            "groupGap": "12px",
+            "groupBorderRadius": "4px",
+            "widgetGap": "12px"
+        }
+    },
+    {
+        "id": "ed2b1d6d08e73773",
+        "type": "global-config",
+        "env": [],
+        "modules": {
+            "node-red-contrib-telegrambot": "18.0.0",
+            "node-red-contrib-aedes": "1.2.0",
+            "@flowfuse/node-red-dashboard": "1.30.2"
+        }
+    }
+]
