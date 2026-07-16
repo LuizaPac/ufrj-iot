@@ -1,0 +1,424 @@
+[
+    {
+        "id": "555da12cdafd599b",
+        "type": "tab",
+        "label": "Braco_Mecanico",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "811f5fd32bf019d4",
+        "type": "aedes broker",
+        "z": "555da12cdafd599b",
+        "name": "",
+        "mqtt_port": "1884",
+        "mqtt_ws_bind": "port",
+        "mqtt_ws_port": "",
+        "mqtt_ws_path": "",
+        "cert": "",
+        "key": "",
+        "certname": "",
+        "keyname": "",
+        "persistence_bind": "memory",
+        "dburl": "",
+        "usetls": false,
+        "x": 170,
+        "y": 180,
+        "wires": [
+            [],
+            []
+        ]
+    },
+    {
+        "id": "b4056e396e717aba",
+        "type": "mqtt out",
+        "z": "555da12cdafd599b",
+        "name": "",
+        "topic": "braco/base/cmd",
+        "qos": "",
+        "retain": "",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "mqtt_broker",
+        "x": 840,
+        "y": 200,
+        "wires": []
+    },
+    {
+        "id": "dd5cdc331271d269",
+        "type": "ui-slider",
+        "z": "555da12cdafd599b",
+        "group": "94f70b5de3d99ffe",
+        "name": "Slide_base",
+        "label": "BASE    ",
+        "tooltip": "",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "passthru": false,
+        "outs": "all",
+        "topic": "payload",
+        "topicType": "msg",
+        "thumbLabel": "true",
+        "showTicks": "always",
+        "min": 0,
+        "max": "180",
+        "step": "5",
+        "className": "",
+        "iconPrepend": "",
+        "iconAppend": "",
+        "color": "",
+        "colorTrack": "none",
+        "colorThumb": "",
+        "showTextField": false,
+        "x": 530,
+        "y": 200,
+        "wires": [
+            [
+                "b4056e396e717aba"
+            ]
+        ]
+    },
+    {
+        "id": "1fcdcaee66c9ef4a",
+        "type": "mqtt in",
+        "z": "555da12cdafd599b",
+        "name": "",
+        "topic": "braco/+/status",
+        "qos": "2",
+        "datatype": "auto-detect",
+        "broker": "mqtt_broker",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 330,
+        "y": 640,
+        "wires": [
+            [
+                "073faeb8fe715885"
+            ]
+        ]
+    },
+    {
+        "id": "073faeb8fe715885",
+        "type": "json",
+        "z": "555da12cdafd599b",
+        "name": "",
+        "property": "payload",
+        "action": "",
+        "pretty": false,
+        "x": 530,
+        "y": 660,
+        "wires": [
+            [
+                "15eac217389e5446"
+            ]
+        ]
+    },
+    {
+        "id": "15eac217389e5446",
+        "type": "debug",
+        "z": "555da12cdafd599b",
+        "name": "debug 1",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 740,
+        "y": 600,
+        "wires": []
+    },
+    {
+        "id": "17c90457a79169c9",
+        "type": "mqtt out",
+        "z": "555da12cdafd599b",
+        "name": "",
+        "topic": "braco/cotovelo/cmd",
+        "qos": "",
+        "retain": "",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "mqtt_broker",
+        "x": 830,
+        "y": 300,
+        "wires": []
+    },
+    {
+        "id": "1c3193b040f7e210",
+        "type": "ui-slider",
+        "z": "555da12cdafd599b",
+        "group": "94f70b5de3d99ffe",
+        "name": "Slide_cotovelo",
+        "label": "COTOVELO",
+        "tooltip": "",
+        "order": 4,
+        "width": 0,
+        "height": 0,
+        "passthru": false,
+        "outs": "all",
+        "topic": "payload",
+        "topicType": "msg",
+        "thumbLabel": "true",
+        "showTicks": "always",
+        "min": 0,
+        "max": "180",
+        "step": "5",
+        "className": "",
+        "iconPrepend": "",
+        "iconAppend": "",
+        "color": "",
+        "colorTrack": "none",
+        "colorThumb": "",
+        "showTextField": false,
+        "x": 500,
+        "y": 300,
+        "wires": [
+            [
+                "17c90457a79169c9"
+            ]
+        ]
+    },
+    {
+        "id": "7834d25fd0ed5dd3",
+        "type": "mqtt out",
+        "z": "555da12cdafd599b",
+        "name": "",
+        "topic": "braco/ombro/cmd",
+        "qos": "",
+        "retain": "",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "mqtt_broker",
+        "x": 750,
+        "y": 440,
+        "wires": []
+    },
+    {
+        "id": "e8af29d90dd67074",
+        "type": "ui-slider",
+        "z": "555da12cdafd599b",
+        "group": "94f70b5de3d99ffe",
+        "name": "Slide_ombro",
+        "label": "OMBRO   ",
+        "tooltip": "",
+        "order": 3,
+        "width": 0,
+        "height": 0,
+        "passthru": false,
+        "outs": "all",
+        "topic": "payload",
+        "topicType": "msg",
+        "thumbLabel": "true",
+        "showTicks": "always",
+        "min": 0,
+        "max": "180",
+        "step": "5",
+        "className": "",
+        "iconPrepend": "",
+        "iconAppend": "",
+        "color": "",
+        "colorTrack": "none",
+        "colorThumb": "",
+        "showTextField": false,
+        "x": 430,
+        "y": 440,
+        "wires": [
+            [
+                "7834d25fd0ed5dd3"
+            ]
+        ]
+    },
+    {
+        "id": "23f6639e849ae332",
+        "type": "mqtt out",
+        "z": "555da12cdafd599b",
+        "name": "",
+        "topic": "braco/garra/cmd",
+        "qos": "",
+        "retain": "",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "mqtt_broker",
+        "x": 760,
+        "y": 520,
+        "wires": []
+    },
+    {
+        "id": "f2fc9af33debfc4f",
+        "type": "ui-slider",
+        "z": "555da12cdafd599b",
+        "group": "94f70b5de3d99ffe",
+        "name": "Slide_garra",
+        "label": "GARRA   ",
+        "tooltip": "",
+        "order": 2,
+        "width": 0,
+        "height": 0,
+        "passthru": false,
+        "outs": "all",
+        "topic": "payload",
+        "topicType": "msg",
+        "thumbLabel": "true",
+        "showTicks": "always",
+        "min": 0,
+        "max": "180",
+        "step": "5",
+        "className": "",
+        "iconPrepend": "",
+        "iconAppend": "",
+        "color": "",
+        "colorTrack": "none",
+        "colorThumb": "",
+        "showTextField": false,
+        "x": 450,
+        "y": 520,
+        "wires": [
+            [
+                "23f6639e849ae332"
+            ]
+        ]
+    },
+    {
+        "id": "mqtt_broker",
+        "type": "mqtt-broker",
+        "name": "Aedes Broker",
+        "broker": "localhost",
+        "port": "1883",
+        "clientid": "",
+        "autoConnect": true,
+        "usetls": false,
+        "protocolVersion": "4",
+        "keepalive": "60",
+        "cleansession": true,
+        "autoUnsubscribe": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": "",
+        "willMsg": {},
+        "userProps": "",
+        "sessionExpiry": ""
+    },
+    {
+        "id": "94f70b5de3d99ffe",
+        "type": "ui-group",
+        "name": "Sliders",
+        "page": "f3cbe59956bde81d",
+        "width": "6",
+        "height": "1",
+        "order": 1,
+        "showTitle": true,
+        "className": "",
+        "visible": "true",
+        "disabled": "false",
+        "groupType": "default"
+    },
+    {
+        "id": "f3cbe59956bde81d",
+        "type": "ui-page",
+        "name": "Braço Mecânico",
+        "ui": "bfeb647f2174941f",
+        "path": "/motor",
+        "icon": "home",
+        "layout": "grid",
+        "theme": "5fceb81df5ebceba",
+        "breakpoints": [
+            {
+                "name": "Default",
+                "px": "0",
+                "cols": "3"
+            },
+            {
+                "name": "Tablet",
+                "px": "576",
+                "cols": "6"
+            },
+            {
+                "name": "Small Desktop",
+                "px": "768",
+                "cols": "9"
+            },
+            {
+                "name": "Desktop",
+                "px": "1024",
+                "cols": "12"
+            }
+        ],
+        "order": 1,
+        "className": "",
+        "visible": "true",
+        "disabled": "false"
+    },
+    {
+        "id": "bfeb647f2174941f",
+        "type": "ui-base",
+        "name": "My Dashboard",
+        "path": "/dashboard",
+        "appIcon": "",
+        "includeClientData": true,
+        "acceptsClientConfig": [
+            "ui-notification",
+            "ui-control"
+        ],
+        "showPathInSidebar": false,
+        "headerContent": "page",
+        "navigationStyle": "default",
+        "titleBarStyle": "default",
+        "showReconnectNotification": true,
+        "notificationDisplayTime": 1,
+        "showDisconnectNotification": true,
+        "allowInstall": false
+    },
+    {
+        "id": "5fceb81df5ebceba",
+        "type": "ui-theme",
+        "name": "Default Theme",
+        "colors": {
+            "surface": "#ffffff",
+            "primary": "#0094CE",
+            "bgPage": "#eeeeee",
+            "groupBg": "#ffffff",
+            "groupOutline": "#cccccc"
+        },
+        "sizes": {
+            "density": "default",
+            "pagePadding": "12px",
+            "groupGap": "12px",
+            "groupBorderRadius": "4px",
+            "widgetGap": "12px"
+        }
+    },
+    {
+        "id": "ef87fccd5d4f1969",
+        "type": "global-config",
+        "env": [],
+        "modules": {
+            "node-red-contrib-aedes": "1.2.0",
+            "@flowfuse/node-red-dashboard": "1.30.2"
+        }
+    }
+]
