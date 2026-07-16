@@ -1,16 +1,16 @@
 [
     {
-        "id": "302918c8c774d99d",
+        "id": "5d397a4f13f152d2",
         "type": "tab",
         "label": "Flow 1",
-        "disabled": false,
+        "disabled": true,
         "info": "",
         "env": []
     },
     {
-        "id": "e866736caf2a71db",
+        "id": "042e4b2687f56fb8",
         "type": "aedes broker",
-        "z": "302918c8c774d99d",
+        "z": "5d397a4f13f152d2",
         "name": "",
         "mqtt_port": 1883,
         "mqtt_ws_bind": "port",
@@ -18,25 +18,22 @@
         "mqtt_ws_path": "",
         "cert": "",
         "key": "",
-        "ca": "",
         "certname": "",
         "keyname": "",
-        "caname": "",
         "persistence_bind": "memory",
         "dburl": "",
-        "persist_to_file": false,
         "usetls": false,
-        "x": 130,
-        "y": 220,
+        "x": 110,
+        "y": 60,
         "wires": [
             [],
             []
         ]
     },
     {
-        "id": "7c94f8cd48f492df",
+        "id": "88de9b77730bfb71",
         "type": "mqtt out",
-        "z": "302918c8c774d99d",
+        "z": "5d397a4f13f152d2",
         "name": "",
         "topic": "casa/motor",
         "qos": "",
@@ -46,15 +43,15 @@
         "userProps": "",
         "correl": "",
         "expiry": "",
-        "broker": "17f2e56a9a257f8c",
-        "x": 550,
-        "y": 220,
+        "broker": "mqtt_broker",
+        "x": 750,
+        "y": 160,
         "wires": []
     },
     {
-        "id": "cf74b89602c6c609",
+        "id": "cf83bcc52898accb",
         "type": "ui-slider",
-        "z": "302918c8c774d99d",
+        "z": "5d397a4f13f152d2",
         "group": "ea6a9891acc070d6",
         "name": "",
         "label": "Girar motor",
@@ -64,11 +61,11 @@
         "height": 0,
         "passthru": false,
         "outs": "all",
-        "topic": "topic",
+        "topic": "payload",
         "topicType": "msg",
         "thumbLabel": "true",
         "showTicks": "always",
-        "min": 0,
+        "min": "-2048",
         "max": "2048",
         "step": 1,
         "className": "",
@@ -78,40 +75,81 @@
         "colorTrack": "",
         "colorThumb": "",
         "showTextField": false,
-        "x": 350,
-        "y": 220,
+        "x": 190,
+        "y": 280,
         "wires": [
             [
-                "7c94f8cd48f492df"
+                "f6f781f138c1f872"
             ]
         ]
     },
     {
-        "id": "17f2e56a9a257f8c",
-        "type": "mqtt-broker",
+        "id": "f6f781f138c1f872",
+        "type": "rbe",
+        "z": "5d397a4f13f152d2",
         "name": "",
+        "func": "rbe",
+        "gap": "",
+        "start": "",
+        "inout": "out",
+        "septopics": true,
+        "property": "payload",
+        "topi": "topic",
+        "x": 350,
+        "y": 460,
+        "wires": [
+            [
+                "16e9ee7d5b18fc35"
+            ]
+        ]
+    },
+    {
+        "id": "16e9ee7d5b18fc35",
+        "type": "delay",
+        "z": "5d397a4f13f152d2",
+        "name": "",
+        "pauseType": "delay",
+        "timeout": "5",
+        "timeoutUnits": "seconds",
+        "rate": "1",
+        "nbRateUnits": "1",
+        "rateUnits": "second",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": false,
+        "allowrate": false,
+        "outputs": 1,
+        "x": 540,
+        "y": 380,
+        "wires": [
+            [
+                "88de9b77730bfb71"
+            ]
+        ]
+    },
+    {
+        "id": "mqtt_broker",
+        "type": "mqtt-broker",
+        "name": "Aedes Broker",
         "broker": "localhost",
-        "port": 1883,
+        "port": "1883",
         "clientid": "",
         "autoConnect": true,
         "usetls": false,
-        "protocolVersion": 4,
-        "keepalive": 60,
+        "protocolVersion": "4",
+        "keepalive": "60",
         "cleansession": true,
         "autoUnsubscribe": true,
         "birthTopic": "",
         "birthQos": "0",
-        "birthRetain": "false",
         "birthPayload": "",
         "birthMsg": {},
         "closeTopic": "",
-        "closeQos": "0",
-        "closeRetain": "false",
         "closePayload": "",
         "closeMsg": {},
         "willTopic": "",
         "willQos": "0",
-        "willRetain": "false",
         "willPayload": "",
         "willMsg": {},
         "userProps": "",
@@ -122,44 +160,44 @@
         "type": "ui-group",
         "name": "Group 1",
         "page": "2f2be903f804d5a7",
-        "width": 6,
-        "height": 1,
+        "width": "6",
+        "height": "1",
         "order": 1,
         "showTitle": true,
         "className": "",
-        "visible": true,
-        "disabled": false,
+        "visible": "true",
+        "disabled": "false",
         "groupType": "default"
     },
     {
         "id": "2f2be903f804d5a7",
         "type": "ui-page",
         "name": "Page 1",
-        "ui": "bfeb647f2174941f",
-        "path": "/page1",
+        "ui": "57f64857745bb674",
+        "path": "/page3",
         "icon": "home",
         "layout": "grid",
         "theme": "ba380fc15bbe05b1",
         "breakpoints": [
             {
                 "name": "Default",
-                "px": 0,
-                "cols": 3
+                "px": "0",
+                "cols": "3"
             },
             {
                 "name": "Tablet",
-                "px": 576,
-                "cols": 6
+                "px": "576",
+                "cols": "6"
             },
             {
                 "name": "Small Desktop",
-                "px": 768,
-                "cols": 9
+                "px": "768",
+                "cols": "9"
             },
             {
                 "name": "Desktop",
-                "px": 1024,
-                "cols": 12
+                "px": "1024",
+                "cols": "12"
             }
         ],
         "order": 1,
@@ -168,7 +206,7 @@
         "disabled": "false"
     },
     {
-        "id": "bfeb647f2174941f",
+        "id": "57f64857745bb674",
         "type": "ui-base",
         "name": "My Dashboard",
         "path": "/dashboard",
@@ -204,15 +242,6 @@
             "groupGap": "12px",
             "groupBorderRadius": "4px",
             "widgetGap": "12px"
-        }
-    },
-    {
-        "id": "bd2fbbd27e0223d3",
-        "type": "global-config",
-        "env": [],
-        "modules": {
-            "node-red-contrib-aedes": "1.2.0",
-            "@flowfuse/node-red-dashboard": "1.30.2"
         }
     }
 ]
